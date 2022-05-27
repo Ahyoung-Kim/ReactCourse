@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   LoadingDiv,
@@ -40,43 +40,11 @@ const countRepls = (repls) => {
   console.log('리뷰 개수를 세는 중...');
   return repls.length;
 };
-const ShowPost = (props) => {
-  const Params = useParams();
-  const [post, setPost] = useState(null);
-  const [repls, setRepls] = useState([]);
-  const [postLoading, setPostLoading] = useState(true);
-  const [replLoading, setReplLoading] = useState(true);
 
-  useEffect(() => {
-    setTimeout(() => {
-      setPost(postData);
-      setPostLoading(false);
-    }, 300);
-  }, []);
-  useEffect(() => {
-    setTimeout(() => {
-      setRepls(replData);
-      setReplLoading(false);
-    }, 1000);
-  }, []);
-
-  const [repl, setRepl] = useState('');
-
-  const onChange = (e) => {
-    setRepl(e.target.value);
-  };
-
-  // for useMemo
-  const replCount = useMemo(() => countRepls(repls), [repls]);
-  // const replCount = countRepls(repls);
-
-  if (!Params.postID) {
-    return <PostSection>잘못된 접근입니다.</PostSection>;
-  }
+const PostAndRepl = React.memo(({post, postLoading, replLoading, repls, replCount}) => {
   return (
-    <div>
-      <PostSection>
-        <PostTitleDiv>
+    <>
+    <PostTitleDiv>
           <PostTitle>
             {/* title */}
             {post && post.title}
@@ -107,9 +75,61 @@ const ShowPost = (props) => {
             </PostReplDiv>
           ))
         )}
+    </>
+  )
+});
 
+const ShowPost = (props) => {
+  const Params = useParams();
+  const [post, setPost] = useState(null);
+  const [repls, setRepls] = useState([]);
+  const [postLoading, setPostLoading] = useState(true);
+  const [replLoading, setReplLoading] = useState(true);
+
+  const replInput = useRef();
+
+  useEffect(() => {
+    setTimeout(() => {
+      setPost(postData);
+      setPostLoading(false);
+    }, 300);
+  }, []);
+  useEffect(() => {
+    setTimeout(() => {
+      setRepls(replData);
+      setReplLoading(false);
+    }, 1000);
+  }, []);
+  useEffect(()=>{
+    setTimeout(()=>{
+      replInput.current.focus();
+    }, 1000)
+  }, []);
+
+  const [repl, setRepl] = useState('');
+
+  const onChange = (e) => {
+    setRepl(e.target.value);
+  };
+
+  // for useMemo
+  const replCount = useMemo(() => countRepls(repls), [repls]);
+  // const replCount = countRepls(repls);
+
+  if (!Params.postID) {
+    return <PostSection>잘못된 접근입니다.</PostSection>;
+  }
+  return (
+    <div>
+      <PostSection>
+        <PostAndRepl
+          post={post}
+          postLoading={postLoading}
+          replCout={replCount}
+          replLoading={replLoading}
+          repls={repls} />
         <WritereplDiv>
-          <ReplInput onChange={onChange} value={repl}></ReplInput>
+          <ReplInput onChange={onChange} value={repl} ref={replInput}></ReplInput>
           <ReplSubmitDiv>
             <span>입력</span>
           </ReplSubmitDiv>

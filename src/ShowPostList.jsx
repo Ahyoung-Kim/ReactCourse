@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import {
     CursorDiv,
@@ -39,11 +39,19 @@ function ShowPostList(){
     const [isPost, setIsPost] = useState(false);
     const [postList, setPostList] = useState([]);
 
-    const addPost = () => {
+    // const addPost = () => {
+    //     setPostList((postList) => [
+    //         ...postList, {id: 4, title: '학보, 시사N 대학기자상 취재', replCount: 21},
+    //     ])
+    // };
+
+    // useCallback으로 addPost() memorize!
+    const addPost = useCallback(() => {
         setPostList((postList) => [
-            ...postList, {id: 4, title: '학보, 시사N 대학기자상 취재', replCount: 21},
+            ...postList, 
+            {id: 4, title: '학보, 시사N 대학기자상 취재', replCount: 21},
         ])
-    };
+    }, [postList]);  // postList가 바뀌면 연산해주세요~ -> dependency 주기
 
     const navigate = useNavigate();
     const goWrite = () => {

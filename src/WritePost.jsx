@@ -9,6 +9,14 @@ import {
   PostWriteDiv,
   TitleInput,
 } from './styledComponent';
+import WriteTitle from './WriteTitle';
+import InputPost from './InputPost';
+
+const SubmitComponent = React.memo(() => {
+  <PostSubmitDiv>
+    <PostSubmit>작성완료</PostSubmit>
+  </PostSubmitDiv>
+})
 
 function WritePost(props) {
   const [inputs, setInputs] = useState({
@@ -26,28 +34,17 @@ function WritePost(props) {
 
   return (
     <PostSection>
-      <PostTitleDiv>
-        <PostTitle>글쓰기</PostTitle>
-      </PostTitleDiv>
+
+      <WriteTitle />
+
       <PostWriteDiv>
-        <TitleInput
-          name="title"
-          type="text"
-          placeholder="제목을 입력해주세요. (15자 이내)"
-          value={title}
-          onChange={onChange}
-        />
-        <ContentsInput
-          name="contents"
-          value={contents}
-          cols="30"
-          rows="10"
-          onChange={onChange}
-        ></ContentsInput>
+        <InputPost onChange={onChange}
+          title={title}
+          contents={contents}/>
       </PostWriteDiv>
-      <PostSubmitDiv>
-        <PostSubmit>작성완료</PostSubmit>
-      </PostSubmitDiv>
+
+      <SubmitComponent />
+      
     </PostSection>
   );
 }
