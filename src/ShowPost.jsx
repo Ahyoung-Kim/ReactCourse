@@ -16,6 +16,7 @@ import {
   WritereplDiv,
 } from './styledComponent';
 import loadingIcon from './loading.svg';
+import axios from 'axios';
 
 const postData = {
   title: '어렵사리 정한 제목입니다.',
@@ -69,9 +70,9 @@ const PostAndRepl = React.memo(({post, postLoading, replLoading, repls, replCoun
         ) : (
           repls &&
           repls.map((element) => (
-            <PostReplDiv key={element.id}>
+            <PostReplDiv key={element}>
               <Replwriter>익명</Replwriter>
-              <Repl>{element.contents}</Repl>
+              <Repl>{element}</Repl>
             </PostReplDiv>
           ))
         )}
@@ -79,7 +80,7 @@ const PostAndRepl = React.memo(({post, postLoading, replLoading, repls, replCoun
   )
 });
 
-const ShowPost = (props) => {
+const ShowPost = ({apiUrl}) => {
   const Params = useParams();
   const [post, setPost] = useState(null);
   const [repls, setRepls] = useState([]);
@@ -88,23 +89,34 @@ const ShowPost = (props) => {
 
   const replInput = useRef();
 
-  useEffect(() => {
-    setTimeout(() => {
-      setPost(postData);
-      setPostLoading(false);
-    }, 300);
-  }, []);
-  useEffect(() => {
-    setTimeout(() => {
-      setRepls(replData);
-      setReplLoading(false);
-    }, 1000);
-  }, []);
   useEffect(()=>{
-    setTimeout(()=>{
-      replInput.current.focus();
-    }, 1000)
+    axios.get(`${apiUrl}posts/${Params.postID}`).then(response => {
+        console.log(response);
+        setPost(response.data);
+        setPostLoading(false);
+        setRepls(response.data.repls);
+        setReplLoading(false);
+        replInput.current.focus();
+      })
   }, []);
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setPost(postData);
+  //     setPostLoading(false);
+  //   }, 300);
+  // }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setRepls(replData);
+  //     setReplLoading(false);
+  //   }, 1000);
+  // }, []);
+  // useEffect(()=>{
+  //   setTimeout(()=>{
+  //     replInput.current.focus();
+  //   }, 1000)
+  // }, []);
 
   const [repl, setRepl] = useState('');
 
@@ -115,6 +127,16 @@ const ShowPost = (props) => {
   // for useMemo
   const replCount = useMemo(() => countRepls(repls), [repls]);
   // const replCount = countRepls(repls);
+
+  const onSubmitRepl = () => {
+    axios.post(`${apiUrl}repl/`, {
+      contents: repl,
+      post: Params.postID,
+    }).then(() => {
+      // 새로고침
+      window.location.reload();
+    })
+  }
 
   if (!Params.postID) {
     return <PostSection>잘못된 접근입니다.</PostSection>;
@@ -130,7 +152,7 @@ const ShowPost = (props) => {
           repls={repls} />
         <WritereplDiv>
           <ReplInput onChange={onChange} value={repl} ref={replInput}></ReplInput>
-          <ReplSubmitDiv>
+          <ReplSubmitDiv onClick={onSubmitRepl}>
             <span>입력</span>
           </ReplSubmitDiv>
         </WritereplDiv>

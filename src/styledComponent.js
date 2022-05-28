@@ -144,6 +144,17 @@ export const PagenumberDiv = styled.div`
   border: 1px solid #f39926;
   border-radius: 5px;
 `;
+
+export const PageEmptyDiv = styled.div`
+width: 30px;
+height: 30px;
+display: flex;
+justify-content: center;
+align-items: center;
+border: 1px solid rgba(0, 0, 0, 0);
+border-radius: 5px;
+`;
+
 export const FooterDiv = styled.div`
   margin-top: 30px;
   display: flex;
